@@ -1,8 +1,15 @@
+//External Imports
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const app = express();
+
+//Internal Imports
+const routes = require('./routes/routes');
+
+//Set the view engine to EJS
+app.set('view engine', 'ejs');
 
 const port = 8080;
 
@@ -11,23 +18,20 @@ const DB_CONNECTION_STRING = `mongodb+srv://${process.env.DB_USER}:${process.env
 
 mongoose.connect(DB_CONNECTION_STRING, {
 	useNewUrlParser: true,
-	useUnifiedTopology: true,
-	useCreateIndex: true,
-	useFindAndModify: false
-}, () => console.log("Connected to DB...."));
+	useUnifiedTopology: true
+}, (res) => console.log('Database connected...'));
 
 //configure body-parser for express
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-//Test route
+//Base route
 app.get('/', (req, res) => {
-    res.send("Hello World");
+    res.render('dashboard/index', {name : 'Shubham'});
 });
 
-//get the users routes from the user controller
-const users = require('./Controller/UsersController');
-app.use('/user', users);
+//Use routes from the routes.js file
+app.use('/v1', routes);
 
 app.listen(port, () => {
     console.log("Server started...");
